@@ -3,8 +3,12 @@ Feature: Test de API Marvel Characters
 
   Background:
     * configure ssl = true
+    * def random = java.util.UUID.randomUUID().toString().substring(0, 10)
     * def baseUrl = 'http://localhost:8080/vycarden/api/characters'
-    * def idPersonaje = 11
+    * def nombreUnico = "Iron Man " + random
+    * def personaje = { name: '#(nombreUnico)', alterego: 'Tony Stark', description: 'Genius billionaire', powers: ['Armor', 'Flight'] }
+    * def personajeActualizado = { name: '#(nombreUnico)', alterego: 'Tony Stark', description: 'Updated description', powers: ['Armor', 'Flight'] }
+
 
   @id:1
   Scenario: T-API-HU-001-CA1-Obtener todos los personajes
@@ -16,21 +20,26 @@ Feature: Test de API Marvel Characters
   @id:2
   Scenario: T-API-HU-001-CA2-Crear personaje (exitoso)
     Given url baseUrl
-    And request { name: 'Iron Man', alterego: 'Tony Stark', description: 'Genius billionaire', powers: ['Armor', 'Flight'] }
+    And request personaje
     And header Content-Type = 'application/json'
     When method post
     Then status 201
-    And match response contains { name: 'Iron Man', alterego: 'Tony Stark', description: 'Genius billionaire', powers: ['Armor', 'Flight'] }
+    And match response contains personaje
 
   @id:3
-  Scenario: T-API-HU-001-CA3-Obtener personaje por ID (exitoso)
+  Scenario: T-API-HU-001-CA3-Obtener personaje por ID (exitoso), despues de crearlo
+    Given url baseUrl
+    And request personaje
+    And header Content-Type = 'application/json'
+    When method post
+    * def idPersonaje = response.id
     Given url baseUrl + '/' + idPersonaje
     When method get
     Then status 200
-    And match response.name == "Iron Man"
-    And match response.alterego == "Tony Stark"
-    And match response.description == "Genius billionaire"
-    And match response.powers == ["Armor","Flight"]
+    And match response.name == personaje.name
+    And match response.alterego == personaje.alterego
+    And match response.description == personaje.description
+    And match response.powers == personaje.powers
 
   @id:4
   Scenario: T-API-HU-001-CA4-Obtener personaje por ID (no existe)
@@ -60,14 +69,19 @@ Feature: Test de API Marvel Characters
 
 
   @id:7
-  Scenario: T-API-HU-001-CA7-Actualizar personaje (exitoso)
+  Scenario: T-API-HU-001-CA7-Actualizar personaje (exitoso), después de haberlo creado
+    Given url baseUrl
+    And request personaje
+    And header Content-Type = 'application/json'
+    When method post
+    * def idPersonaje = response.id
     Given url baseUrl + '/' + idPersonaje
-    And request { name: 'Iron Man', alterego: 'Tony Stark', description: 'Updated description', powers: ['Armor', 'Flight'] }
+    And request personajeActualizado
     And header Content-Type = 'application/json'
     When method put
     Then status 200
-    And match response.name == "Iron Man"
-    And match response.description == "Updated description"
+    And match response.name == personajeActualizado.name
+    And match response.description == personajeActualizado.description
 
 
   @id:3
@@ -80,7 +94,12 @@ Feature: Test de API Marvel Characters
     And match response == { error: 'Character not found' }
 
   @id:9
-  Scenario: T-API-HU-001-CA9-Eliminar personaje (exitoso)
+  Scenario: T-API-HU-001-CA9-Eliminar personaje (exitoso), después de haberlo creado
+    Given url baseUrl
+    And request personaje
+    And header Content-Type = 'application/json'
+    When method post
+    * def idPersonaje = response.id
     Given url baseUrl + '/'+idPersonaje
     When method delete
     Then status 204
