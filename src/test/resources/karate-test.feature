@@ -4,7 +4,7 @@ Feature: Test de API Marvel Characters
   Background:
     * configure ssl = true
     * def baseUrl = 'http://localhost:8080/vycarden/api/characters'
-    * def idPersonaje = 11
+    * def idPersonaje = 1
 
   @id:1
   Scenario: T-API-HU-001-CA1-Obtener todos los personajes
