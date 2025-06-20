@@ -9,7 +9,6 @@ Feature: Test de API Marvel Characters
     * def personaje = { name: '#(nombreUnico)', alterego: 'Tony Stark', description: 'Genius billionaire', powers: ['Armor', 'Flight'] }
     * def personajeActualizado = { name: '#(nombreUnico)', alterego: 'Tony Stark', description: 'Updated description', powers: ['Armor', 'Flight'] }
 
-
   @id:1
   Scenario: T-API-HU-001-CA1-Obtener todos los personajes
     Given url baseUrl
